@@ -26,7 +26,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .red { color: #D85A30; }
 .orange { color: #E8A020; }
 label { font-size: 13px; color: #666; display: block; margin-bottom: 4px; margin-top: 12px; }
-input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #e0e0db; border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff; color: #1a1a1a; outline: none; transition: border 0.15s; }
+input, select { width: 100%; padding: 10px 12px; border: 1px solid #e0e0db; border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff; color: #1a1a1a; outline: none; transition: border 0.15s; }
 input:focus, select:focus { border-color: #bbb; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
@@ -82,7 +82,7 @@ input:focus, select:focus { border-color: #bbb; }
 .chart-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .chart-bar-label { font-size: 12px; color: #666; width: 110px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chart-bar-bg { flex: 1; background: #f0f0eb; border-radius: 4px; height: 20px; overflow: hidden; }
-.chart-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; }
+.chart-bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; }
 .chart-bar-val { font-size: 11px; font-weight: 600; color: #fff; white-space: nowrap; }
 .month-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .compare-card { background: #f5f5f0; border-radius: 10px; padding: 0.8rem; }
@@ -163,7 +163,7 @@ input:focus, select:focus { border-color: #bbb; }
       </select>
       <label>Рахунок</label>
       <select id="tx-account" onchange="updateAccountCurrency()">
-        <option>Monobank</option><option>PL Bank</option><option>Готівка</option>
+        <option>Monobank</option><option>PL Bank</option><option>Готівка PLN</option><option>Готівка USD</option>
       </select>
       <label>Опис (необов'язково)</label>
       <input type="text" id="tx-desc" placeholder="Наприклад: бокс, продукти...">
@@ -186,7 +186,9 @@ input:focus, select:focus { border-color: #bbb; }
             <option>🥊 Спорт</option><option>🚬 Цигарки</option><option>📱 Зв'язок</option><option>🎁 Інше</option>
           </select>
         </div>
-        <select id="ap-account" style="margin-top:8px"><option>Monobank</option><option>PL Bank</option><option>Готівка</option></select>
+        <select id="ap-account" style="margin-top:8px">
+          <option>Monobank</option><option>PL Bank</option><option>Готівка PLN</option><option>Готівка USD</option>
+        </select>
         <button class="btn-primary" onclick="addAutoPay()">Додати автоплатіж</button>
       </div>
     </div>
@@ -199,13 +201,13 @@ input:focus, select:focus { border-color: #bbb; }
       <div id="accounts-list"></div>
     </div>
     <div class="card">
-      <div class="section-title">Додати / редагувати рахунок</div>
+      <div class="section-title">Додати рахунок</div>
       <input type="text" id="new-acct-name" placeholder="Назва рахунку">
       <div class="row2" style="margin-top:8px">
         <select id="new-acct-currency"><option>USD</option><option>PLN</option><option>UAH</option><option>EUR</option></select>
         <input type="number" id="new-acct-initial" placeholder="Початковий баланс">
       </div>
-      <p style="font-size:11px;color:#aaa;margin-top:6px">Поточний баланс = початковий + всі транзакції</p>
+      <p style="font-size:11px;color:#aaa;margin-top:6px">Баланс = початковий + всі транзакції по цьому рахунку</p>
       <button class="btn-primary" onclick="addAccount()">Додати рахунок</button>
       <div class="status-bar" id="acct-status"></div>
     </div>
@@ -277,7 +279,7 @@ input:focus, select:focus { border-color: #bbb; }
       <div class="month-compare">
         <div class="compare-card"><div class="compare-label">Витрати</div><div class="compare-val red" id="an-expenses">$0</div><div class="compare-diff" id="an-expenses-diff"></div></div>
         <div class="compare-card"><div class="compare-label">Дохід</div><div class="compare-val green" id="an-income">$0</div><div class="compare-diff" id="an-income-diff"></div></div>
-        <div class="compare-card"><div class="compare-label">Залишок</div><div class="compare-val" id="an-net">$0</div><div class="compare-diff" id="an-net-diff"></div></div>
+        <div class="compare-card"><div class="compare-label">Залишок</div><div class="compare-val" id="an-net">$0</div><div class="compare-diff"></div></div>
         <div class="compare-card"><div class="compare-label">Предикт витрат</div><div class="compare-val orange" id="an-predict">$0</div><div class="compare-diff" id="an-predict-sub" style="color:#aaa"></div></div>
       </div>
     </div>
@@ -360,14 +362,13 @@ input:focus, select:focus { border-color: #bbb; }
     <div class="status-bar" id="edit-status"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEditModal()">Скасувати</button>
-      <button class="btn-primary" id="edit-save-btn" onclick="updateTransaction()">Зберегти</button>
+      <button class="btn-primary" id="edit-save-btn" onclick="updateTransaction()" style="margin-top:0">Зберегти</button>
     </div>
   </div>
 </div>
 
 <script>
-const DEFAULT_URL = '';
-function getScriptUrl() { return localStorage.getItem('ft_script_url') || DEFAULT_URL; }
+function getScriptUrl() { return localStorage.getItem('ft_script_url') || ''; }
 function getRates() { return JSON.parse(localStorage.getItem('ft_rates') || 'null') || { PLN: 0.25, UAH: 0.024, EUR: 1.08, USD: 1 }; }
 
 let state = {
@@ -375,7 +376,8 @@ let state = {
   accounts: JSON.parse(localStorage.getItem('ft_accounts') || 'null') || [
     { name: 'Monobank', currency: 'UAH', initial: 0 },
     { name: 'PL Bank', currency: 'PLN', initial: 0 },
-    { name: 'Готівка', currency: 'PLN', initial: 0 }
+    { name: 'Готівка PLN', currency: 'PLN', initial: 0 },
+    { name: 'Готівка USD', currency: 'USD', initial: 0 }
   ],
   debts: JSON.parse(localStorage.getItem('ft_debts') || 'null') || [],
   goals: JSON.parse(localStorage.getItem('ft_goals') || '[]'),
@@ -448,18 +450,15 @@ function writeToSheets(sheet, row) {
   const url = getScriptUrl() + '?action=write&sheet=' + encodeURIComponent(sheet) + '&row=' + encodeURIComponent(JSON.stringify(row));
   return jsonp(url);
 }
-
 function deleteFromSheets(sheet, id) {
-  const url = getScriptUrl() + '?action=delete&sheet=' + encodeURIComponent(sheet) + '&id=' + encodeURIComponent(id);
+  const url = getScriptUrl() + '?action=delete&sheet=' + encodeURIComponent(sheet) + '&id=' + encodeURIComponent(String(id));
   return jsonp(url);
 }
-
 function updateInSheets(sheet, id, row) {
-  const url = getScriptUrl() + '?action=update&sheet=' + encodeURIComponent(sheet) + '&id=' + encodeURIComponent(id) + '&row=' + encodeURIComponent(JSON.stringify(row));
+  const url = getScriptUrl() + '?action=update&sheet=' + encodeURIComponent(sheet) + '&id=' + encodeURIComponent(String(id)) + '&row=' + encodeURIComponent(JSON.stringify(row));
   return jsonp(url);
 }
 
-// Calculate account balance from transactions
 function getAccountBalance(accountName, currency) {
   const acct = state.accounts.find(a => a.name === accountName);
   const initial = acct ? (parseFloat(acct.initial) || 0) : 0;
@@ -473,6 +472,26 @@ function getAccountBalance(accountName, currency) {
   return balance;
 }
 
+// FIX 1: handle empty sheet (only header row or truly empty)
+function parseTransactions(rows) {
+  if (!rows || rows.length === 0) return [];
+  // find header row — skip it
+  const dataRows = rows.length > 1 ? rows.slice(1) : [];
+  return dataRows
+    .filter(r => r[0] && r[1]) // must have date and type
+    .map(r => ({
+      date: String(r[0]),
+      type: String(r[1]),
+      amount: r[2],
+      currency: String(r[3] || 'USD'),
+      category: String(r[4] || ''),
+      account: String(r[5] || ''),
+      desc: String(r[6] || ''),
+      id: String(r[7] || r[0] + '_' + r[2]) // fallback id if missing
+    }))
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
 async function loadTransactions() {
   const el = document.getElementById('recent-list');
   el.innerHTML = '<div class="empty">Завантажуємо...</div>';
@@ -482,18 +501,10 @@ async function loadTransactions() {
   }
   try {
     const data = await jsonp(getScriptUrl() + '?sheet=Transactions');
-    if (!data.rows || data.rows.length <= 1) {
-      state.transactions = [];
+    state.transactions = parseTransactions(data.rows);
+    if (!state.transactions.length) {
       el.innerHTML = '<div class="empty">Транзакцій ще немає</div>';
-      renderMetrics();
-      return;
     }
-    state.transactions = data.rows.slice(1).map(r => ({
-      date: String(r[0]), type: String(r[1]), amount: r[2],
-      currency: String(r[3]), category: String(r[4]),
-      account: String(r[5]), desc: String(r[6] || ''),
-      id: String(r[7] || '')
-    })).filter(t => t.date && t.type).sort((a, b) => new Date(b.date) - new Date(a.date));
     renderHome();
   } catch(e) {
     el.innerHTML = '<div class="empty" style="color:#D85A30">Помилка: ' + e.message + '</div>';
@@ -520,12 +531,12 @@ function renderMetrics() {
   const now = new Date();
   const txs = getMonthTxs(state.transactions, now.getFullYear(), now.getMonth());
   const { income, expenses } = calcTotals(txs);
-  const prevTxs = getMonthTxs(state.transactions, now.getFullYear(), now.getMonth() === 0 ? 11 : now.getMonth() - 1);
-  const prev = calcTotals(prevTxs);
+  const prevMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+  const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+  const prev = calcTotals(getMonthTxs(state.transactions, prevYear, prevMonth));
 
-  const totalBalance = state.accounts.reduce((s, a) => {
-    return s + toUSD(getAccountBalance(a.name, a.currency), a.currency);
-  }, 0);
+  // FIX 2: recalculate balance from transactions every time
+  const totalBalance = state.accounts.reduce((s, a) => s + toUSD(getAccountBalance(a.name, a.currency), a.currency), 0);
   const totalDebts = state.debts.reduce((s, d) => s + Math.max(0, d.total - d.paid), 0);
 
   document.getElementById('total-balance').textContent = fmtUSD(totalBalance);
@@ -533,14 +544,13 @@ function renderMetrics() {
   document.getElementById('month-expenses').textContent = fmtUSD(expenses);
   document.getElementById('total-debts').textContent = fmtUSD(totalDebts);
 
-  const diff = (curr, prev) => {
+  const diffText = (curr, prev) => {
     if (!prev) return '';
     const pct = Math.round((curr - prev) / prev * 100);
-    return (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct) + '% vs минулий міс';
+    return (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct) + '% vs минулий';
   };
-  document.getElementById('month-income-sub').textContent = diff(income, prev.income);
-  document.getElementById('month-expenses-sub').textContent = diff(expenses, prev.expenses);
-
+  document.getElementById('month-income-sub').textContent = diffText(income, prev.income);
+  document.getElementById('month-expenses-sub').textContent = diffText(expenses, prev.expenses);
   renderLimitsHome(txs);
 }
 
@@ -570,7 +580,7 @@ function renderHome() {
   renderMetrics();
   const list = document.getElementById('recent-list');
   if (!state.transactions.length) {
-    list.innerHTML = '<div class="empty">Натисни "Оновити" щоб завантажити дані</div>';
+    list.innerHTML = '<div class="empty">Транзакцій ще немає</div>';
     return;
   }
   list.innerHTML = state.transactions.slice(0, 30).map(t => {
@@ -600,14 +610,11 @@ function renderHome() {
 
 function renderAccounts() {
   document.getElementById('accounts-list').innerHTML = state.accounts.length
-    ? state.accounts.map((a, i) => {
+    ? state.accounts.map(a => {
         const bal = getAccountBalance(a.name, a.currency);
         const usd = toUSD(bal, a.currency);
         return `<div class="acct-row">
-          <div>
-            <div class="acct-name">${a.name}</div>
-            <div class="acct-sub">${a.currency} · початковий: ${fmt(a.initial || 0, a.currency)}</div>
-          </div>
+          <div><div class="acct-name">${a.name}</div><div class="acct-sub">${a.currency}</div></div>
           <div style="text-align:right">
             <div class="acct-bal ${bal >= 0 ? 'green' : 'red'}">${bal >= 0 ? '+' : ''}${fmt(bal, a.currency)}</div>
             ${a.currency !== 'USD' ? `<div class="acct-bal-sub">${bal >= 0 ? '+' : ''}${fmtUSD(usd)}</div>` : ''}
@@ -694,11 +701,8 @@ function renderGoals() {
     const remaining = Math.max(0, g.target - g.saved);
     return `<div class="acct-row" style="align-items:flex-start">
       <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:20px">${g.emoji || '🎯'}</span>
-          <div class="acct-name">${g.name}</div>
-        </div>
-        <div class="acct-sub" style="margin-top:2px">$${g.saved.toLocaleString()} з $${g.target.toLocaleString()} · ${pct}%${remaining > 0 ? ' · ще $' + remaining.toLocaleString() : ' · Досягнуто! 🎉'}</div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:20px">${g.emoji||'🎯'}</span><div class="acct-name">${g.name}</div></div>
+        <div class="acct-sub" style="margin-top:2px">$${g.saved.toLocaleString()} з $${g.target.toLocaleString()} · ${pct}%${remaining>0?' · ще $'+remaining.toLocaleString():' · Досягнуто! 🎉'}</div>
         <div class="goal-bar-wrap"><div class="goal-bar" style="width:${pct}%"></div></div>
       </div>
       <div style="margin-left:12px;display:flex;gap:4px;flex-shrink:0">
@@ -713,15 +717,12 @@ function updateGoalSaved(i) {
   const add = parseFloat(prompt('Скільки додати?'));
   if (isNaN(add) || add <= 0) return;
   state.goals[i].saved = (state.goals[i].saved || 0) + add;
-  saveLocal();
-  renderGoals();
+  saveLocal(); renderGoals();
 }
 
 function deleteGoal(i) {
   if (!confirm('Видалити ціль "' + state.goals[i].name + '"?')) return;
-  state.goals.splice(i, 1);
-  saveLocal();
-  renderGoals();
+  state.goals.splice(i, 1); saveLocal(); renderGoals();
 }
 
 function addGoal() {
@@ -741,8 +742,7 @@ function addGoal() {
 }
 
 function renderLimits() {
-  const limits = state.limits;
-  const keys = Object.keys(limits);
+  const limits = state.limits, keys = Object.keys(limits);
   if (!keys.length) { document.getElementById('limits-list').innerHTML = '<div class="empty" style="padding:0.5rem 0">Немає лімітів</div>'; return; }
   const now = new Date();
   const txs = getMonthTxs(state.transactions, now.getFullYear(), now.getMonth());
@@ -753,13 +753,9 @@ function renderLimits() {
     const pct = Math.min(100, Math.round(sp / lim * 100));
     const color = pct >= 100 ? '#D85A30' : pct >= 80 ? '#E8A020' : '#1D9E75';
     return `<div class="cat-limit-row"><div style="flex:1">
-      <div style="display:flex;justify-content:space-between">
-        <span style="font-size:13px">${cat}</span>
-        <span style="font-size:12px;color:${color};font-weight:500">${fmtUSD(sp)} / ${fmtUSD(lim)}</span>
-      </div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:13px">${cat}</span><span style="font-size:12px;color:${color};font-weight:500">${fmtUSD(sp)} / ${fmtUSD(lim)}</span></div>
       <div class="limit-bar-wrap"><div class="limit-bar" style="width:${pct}%;background:${color}"></div></div>
-    </div>
-    <button class="btn-sm danger" style="margin-left:8px;flex-shrink:0" onclick="deleteLimit('${cat}')">✕</button></div>`;
+    </div><button class="btn-sm danger" style="margin-left:8px;flex-shrink:0" onclick="deleteLimit('${cat}')">✕</button></div>`;
   }).join('');
 }
 
@@ -767,25 +763,19 @@ function addLimit() {
   const cat = document.getElementById('limit-cat').value;
   const amount = parseFloat(document.getElementById('limit-amount').value) || 0;
   if (!amount) return;
-  state.limits[cat] = amount;
-  saveLocal();
+  state.limits[cat] = amount; saveLocal();
   document.getElementById('limit-amount').value = '';
   renderLimits();
 }
 
-function deleteLimit(cat) {
-  delete state.limits[cat];
-  saveLocal();
-  renderLimits();
-}
+function deleteLimit(cat) { delete state.limits[cat]; saveLocal(); renderLimits(); }
 
 function renderAutoPays() {
   const list = document.getElementById('auto-pay-list');
   if (!state.autoPays.length) { list.innerHTML = '<div class="empty">Немає автоплатежів</div>'; return; }
   list.innerHTML = state.autoPays.map((ap, i) => `
     <div class="auto-pay-row">
-      <div>
-        <div style="font-size:13px;font-weight:500">${ap.name}</div>
+      <div><div style="font-size:13px;font-weight:500">${ap.name}</div>
         <div style="font-size:11px;color:#999">${fmtDual(ap.amount, ap.currency)} · ${ap.category} · ${ap.account}</div>
       </div>
       <div style="display:flex;gap:6px">
@@ -819,12 +809,11 @@ async function applyAutoPay(i) {
     await writeToSheets('Transactions', [date, 'expense', ap.amount, ap.currency, ap.category, ap.account, ap.name, id]);
     state.transactions.unshift({ date, type: 'expense', amount: ap.amount, currency: ap.currency, category: ap.category, account: ap.account, desc: ap.name, id });
     state.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-    renderMetrics();
+    renderHome();
     alert('✓ ' + ap.name + ' вписано!');
   } catch(e) { alert('Помилка: ' + e.message); }
 }
 
-// EDIT MODAL
 function openEditModal(id) {
   const t = state.transactions.find(tx => tx.id === id);
   if (!t) return;
@@ -835,10 +824,8 @@ function openEditModal(id) {
   document.getElementById('edit-tx-category').value = t.category;
   document.getElementById('edit-tx-desc').value = t.desc || '';
   document.getElementById('edit-tx-date').value = t.date;
-
   const sel = document.getElementById('edit-tx-account');
   sel.innerHTML = state.accounts.map(a => `<option ${a.name === t.account ? 'selected' : ''}>${a.name}</option>`).join('');
-
   updateEditPreview();
   document.getElementById('edit-modal').style.display = 'flex';
 }
@@ -863,35 +850,29 @@ async function updateTransaction() {
   const account = document.getElementById('edit-tx-account').value;
   const desc = document.getElementById('edit-tx-desc').value;
   const date = document.getElementById('edit-tx-date').value;
-
   if (!amount || !date) { setStatus('edit-status', 'Введи суму та дату', 'error'); return; }
-
   const btn = document.getElementById('edit-save-btn');
   btn.disabled = true;
   setStatus('edit-status', 'Зберігаємо...', 'loading');
-
   try {
     await updateInSheets('Transactions', id, [date, type, amount, currency, category, account, desc, id]);
     const idx = state.transactions.findIndex(t => t.id === id);
     if (idx >= 0) state.transactions[idx] = { date, type, amount, currency, category, account, desc, id };
     state.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
     setStatus('edit-status', '✓ Оновлено!', 'success');
-    setTimeout(() => { closeEditModal(); renderHome(); }, 1000);
-  } catch(e) {
-    setStatus('edit-status', 'Помилка: ' + e.message, 'error');
-  }
+    setTimeout(() => { closeEditModal(); renderHome(); }, 800);
+  } catch(e) { setStatus('edit-status', 'Помилка: ' + e.message, 'error'); }
   btn.disabled = false;
 }
 
+// FIX 2: after delete — filter from state and re-render metrics
 async function deleteTx(id) {
   if (!confirm('Видалити цю транзакцію?')) return;
   try {
     await deleteFromSheets('Transactions', id);
     state.transactions = state.transactions.filter(t => t.id !== id);
-    renderHome();
-  } catch(e) {
-    alert('Помилка видалення: ' + e.message);
-  }
+    renderHome(); // this calls renderMetrics() which recalculates balance
+  } catch(e) { alert('Помилка видалення: ' + e.message); }
 }
 
 function populateAnalyticsMonths() {
@@ -899,16 +880,16 @@ function populateAnalyticsMonths() {
   const months = new Set();
   state.transactions.forEach(t => {
     const d = new Date(t.date);
-    months.add(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
+    months.add(d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'));
   });
   const now = new Date();
-  months.add(now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'));
+  months.add(now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0'));
   const sorted = [...months].sort().reverse();
   const current = sel.value || sorted[0];
   sel.innerHTML = sorted.map(m => {
     const [y, mo] = m.split('-');
-    const label = new Date(y, mo - 1).toLocaleString('uk', { month: 'long', year: 'numeric' });
-    return `<option value="${m}" ${m === current ? 'selected' : ''}>${label}</option>`;
+    const label = new Date(y, mo-1).toLocaleString('uk', { month: 'long', year: 'numeric' });
+    return `<option value="${m}" ${m===current?'selected':''}>${label}</option>`;
   }).join('');
 }
 
@@ -916,33 +897,31 @@ function renderAnalytics() {
   const val = document.getElementById('analytics-month').value;
   if (!val) return;
   const [year, month] = val.split('-').map(Number);
-  const txs = getMonthTxs(state.transactions, year, month - 1);
-  const prevMonth = month - 2 < 0 ? 11 : month - 2;
-  const prevYear = month - 2 < 0 ? year - 1 : year;
+  const txs = getMonthTxs(state.transactions, year, month-1);
+  const prevMonth = month-2 < 0 ? 11 : month-2;
+  const prevYear = month-2 < 0 ? year-1 : year;
   const prevTxs = getMonthTxs(state.transactions, prevYear, prevMonth);
-  const curr = calcTotals(txs);
-  const prev = calcTotals(prevTxs);
+  const curr = calcTotals(txs), prev = calcTotals(prevTxs);
 
   document.getElementById('an-expenses').textContent = fmtUSD(curr.expenses);
   document.getElementById('an-income').textContent = fmtUSD(curr.income);
   document.getElementById('an-net').textContent = (curr.net >= 0 ? '+' : '') + fmtUSD(curr.net);
   document.getElementById('an-net').className = 'compare-val ' + (curr.net >= 0 ? 'green' : 'red');
 
-  const diffHtml = (curr, prev, isExpense) => {
-    if (!prev) return '';
-    const pct = Math.round((curr - prev) / prev * 100);
-    const color = isExpense ? (pct > 0 ? '#D85A30' : '#1D9E75') : (pct > 0 ? '#1D9E75' : '#D85A30');
-    return `<span style="color:${color}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct)}% vs минулий</span>`;
+  const diffHtml = (c, p, isExp) => {
+    if (!p) return '';
+    const pct = Math.round((c-p)/p*100);
+    const color = isExp ? (pct>0?'#D85A30':'#1D9E75') : (pct>0?'#1D9E75':'#D85A30');
+    return `<span style="color:${color}">${pct>=0?'▲':'▼'} ${Math.abs(pct)}% vs минулий</span>`;
   };
   document.getElementById('an-expenses-diff').innerHTML = diffHtml(curr.expenses, prev.expenses, true);
   document.getElementById('an-income-diff').innerHTML = diffHtml(curr.income, prev.income, false);
 
   const now = new Date();
-  const isCurrentMonth = year === now.getFullYear() && (month - 1) === now.getMonth();
-  if (isCurrentMonth && curr.expenses > 0) {
-    const day = now.getDate();
-    const daysInMonth = new Date(year, month, 0).getDate();
-    document.getElementById('an-predict').textContent = fmtUSD(Math.round(curr.expenses / day * daysInMonth));
+  const isCurrent = year===now.getFullYear() && (month-1)===now.getMonth();
+  if (isCurrent && curr.expenses > 0) {
+    const day = now.getDate(), daysInMonth = new Date(year, month, 0).getDate();
+    document.getElementById('an-predict').textContent = fmtUSD(Math.round(curr.expenses/day*daysInMonth));
     document.getElementById('an-predict-sub').textContent = 'на основі ' + day + ' днів';
   } else {
     document.getElementById('an-predict').textContent = '—';
@@ -950,40 +929,34 @@ function renderAnalytics() {
   }
 
   const catSpent = {};
-  txs.filter(t => t.type === 'expense').forEach(t => { catSpent[t.category] = (catSpent[t.category] || 0) + toUSD(t.amount, t.currency); });
-  const sortedCats = Object.entries(catSpent).sort((a, b) => b[1] - a[1]);
+  txs.filter(t=>t.type==='expense').forEach(t => { catSpent[t.category] = (catSpent[t.category]||0) + toUSD(t.amount,t.currency); });
+  const sortedCats = Object.entries(catSpent).sort((a,b)=>b[1]-a[1]);
   const maxVal = sortedCats[0]?.[1] || 1;
   const colors = ['#1D9E75','#378ADD','#D85A30','#E8A020','#9370DB','#E8609A','#5DCAA5','#85B7EB'];
   document.getElementById('an-cat-bars').innerHTML = sortedCats.length
     ? sortedCats.map(([cat, val], i) => `
         <div class="chart-bar-row">
           <div class="chart-bar-label">${cat}</div>
-          <div class="chart-bar-bg">
-            <div class="chart-bar-fill" style="width:${Math.round(val/maxVal*100)}%;background:${colors[i%colors.length]}">
-              <span class="chart-bar-val">${fmtUSD(val)}</span>
-            </div>
-          </div>
+          <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round(val/maxVal*100)}%;background:${colors[i%colors.length]}">
+            <span class="chart-bar-val">${fmtUSD(val)}</span>
+          </div></div>
         </div>`).join('')
     : '<div class="empty">Немає витрат</div>';
 
   const prevCatSpent = {};
-  prevTxs.filter(t => t.type === 'expense').forEach(t => { prevCatSpent[t.category] = (prevCatSpent[t.category] || 0) + toUSD(t.amount, t.currency); });
+  prevTxs.filter(t=>t.type==='expense').forEach(t => { prevCatSpent[t.category] = (prevCatSpent[t.category]||0) + toUSD(t.amount,t.currency); });
   const allCats = [...new Set([...Object.keys(catSpent), ...Object.keys(prevCatSpent)])];
-  const maxComp = Math.max(...allCats.map(c => Math.max(catSpent[c] || 0, prevCatSpent[c] || 0)), 1);
+  const maxComp = Math.max(...allCats.map(c=>Math.max(catSpent[c]||0,prevCatSpent[c]||0)),1);
   document.getElementById('an-compare-bars').innerHTML = allCats.length
-    ? allCats.sort((a, b) => (catSpent[b] || 0) - (catSpent[a] || 0)).map(cat => {
-        const c = catSpent[cat] || 0, p = prevCatSpent[cat] || 0;
+    ? allCats.sort((a,b)=>(catSpent[b]||0)-(catSpent[a]||0)).map(cat => {
+        const c = catSpent[cat]||0, p = prevCatSpent[cat]||0;
         return `<div style="margin-bottom:10px">
           <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px">
-            <span>${cat}</span><span>${fmtUSD(c)}${p > 0 ? ' / ' + fmtUSD(p) : ''}</span>
+            <span>${cat}</span><span>${fmtUSD(c)}${p>0?' / '+fmtUSD(p):''}</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:3px">
-            <div style="background:#f0f0eb;border-radius:3px;height:12px;overflow:hidden">
-              <div style="height:100%;width:${Math.round(c/maxComp*100)}%;background:#378ADD;border-radius:3px"></div>
-            </div>
-            ${p > 0 ? `<div style="background:#f0f0eb;border-radius:3px;height:12px;overflow:hidden">
-              <div style="height:100%;width:${Math.round(p/maxComp*100)}%;background:#aaa;border-radius:3px;opacity:0.7"></div>
-            </div>` : ''}
+            <div style="background:#f0f0eb;border-radius:3px;height:12px;overflow:hidden"><div style="height:100%;width:${Math.round(c/maxComp*100)}%;background:#378ADD;border-radius:3px"></div></div>
+            ${p>0?`<div style="background:#f0f0eb;border-radius:3px;height:12px;overflow:hidden"><div style="height:100%;width:${Math.round(p/maxComp*100)}%;background:#aaa;border-radius:3px;opacity:0.7"></div></div>`:''}
           </div>
         </div>`;
       }).join('') + `<div style="display:flex;gap:12px;font-size:11px;color:#999;margin-top:8px">
@@ -1017,12 +990,13 @@ function saveScriptUrl() {
   setStatus('settings-status', '✓ URL збережено!', 'success');
 }
 
-async function addAccount() {
+// FIX 3: validate by name only (user can have same currency different name)
+function addAccount() {
   const name = document.getElementById('new-acct-name').value.trim();
   const currency = document.getElementById('new-acct-currency').value;
   const initial = parseFloat(document.getElementById('new-acct-initial').value) || 0;
   if (!name) { setStatus('acct-status', 'Введи назву', 'error'); return; }
-  if (state.accounts.find(a => a.name === name)) { setStatus('acct-status', 'Такий рахунок вже є', 'error'); return; }
+  if (state.accounts.find(a => a.name === name)) { setStatus('acct-status', 'Рахунок з такою назвою вже є. Використай іншу назву, наприклад "Готівка USD"', 'error'); return; }
   state.accounts.push({ name, currency, initial });
   saveLocal();
   ['tx-account', 'ap-account', 'edit-tx-account'].forEach(id => {
@@ -1044,14 +1018,11 @@ async function saveTransaction() {
   const desc = document.getElementById('tx-desc').value;
   const date = document.getElementById('tx-date').value;
   const id = Date.now().toString();
-
   if (!amount || amount <= 0) { setStatus('save-status', 'Введи суму', 'error'); return; }
   if (!date) { setStatus('save-status', 'Введи дату', 'error'); return; }
-
   const btn = document.getElementById('save-btn');
   btn.disabled = true;
   setStatus('save-status', 'Зберігаємо...', 'loading');
-
   try {
     const result = await writeToSheets('Transactions', [date, type, amount, currency, category, account, desc, id]);
     if (result && result.success) {
@@ -1065,9 +1036,7 @@ async function saveTransaction() {
     } else {
       setStatus('save-status', 'Помилка: ' + (result?.error || 'невідома'), 'error');
     }
-  } catch(e) {
-    setStatus('save-status', 'Помилка: ' + e.message, 'error');
-  }
+  } catch(e) { setStatus('save-status', 'Помилка: ' + e.message, 'error'); }
   btn.disabled = false;
 }
 
